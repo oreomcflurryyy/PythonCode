@@ -1,0 +1,275 @@
+import random
+import time
+import curses
+import os
+
+hangman1 = [
+    [" __________"],
+    ["||        |"],
+    ["||        |"],
+    ["||         "],
+    ["||        "],
+    ["||        "],
+    ["||        "],
+    ["||"],
+    ["||____________"]
+    ]
+
+hangman2 = [
+    [" __________"],
+    ["||        |"],
+    ["||        |"],
+    ["||        O"],
+    ["||        "],
+    ["||         "],
+    ["||        "],
+    ["||"],
+    ["||____________"]
+    ]
+
+hangman3 = [
+    [" __________"],
+    ["||        |"],
+    ["||        |"],
+    ["||        O"],
+    ["||        |"],
+    ["||        "],
+    ["||        "],
+    ["||"],
+    ["||____________"]
+    ]
+
+hangman4 = [
+    [" __________"],
+    ["||        |"],
+    ["||        |"],
+    ["||        O"],
+    ["||        |"],
+    ["||        |"],
+    ["||       "],
+    ["||"],
+    ["||____________"]
+    ]
+
+hangman5 = [
+    [" __________"],
+    ["||        |"],
+    ["||        |"],
+    ["||        O"],
+    ["||        |"],
+    ["||        |"],
+    ["||       / "],
+    ["||"],
+    ["||____________"]
+    ]
+
+hangman6 = [
+    [" __________"],
+    ["||        |"],
+    ["||        |"],
+    ["||        O"],
+    ["||        |"],
+    ["||        |"],
+    ["||       / \\"],
+    ["||"],
+    ["||____________"]
+    ]
+
+hangman7 = [
+    [" __________"],
+    ["||        |"],
+    ["||        |"],
+    ["||        O"],
+    ["||       /|\\"],
+    ["||        |"],
+    ["||       / \\"],
+    ["||"],
+    ["||____________"]
+    ]
+
+hangman8 = [
+    [" __________"],
+    ["||        |"],
+    ["||        |"],
+    ["||       \O"],
+    ["||        |"],
+    ["||        |"],
+    ["||       / \\"],
+    ["||"],
+    ["||____________"]
+    ]
+
+hangman9 = [
+    [" __________"],
+    ["||        |"],
+    ["||        |"],
+    ["||       \O/"],
+    ["||        |"],
+    ["||        |"],
+    ["||       / \\"],
+    ["||"],
+    ["||____________"]
+    ]
+
+hangman10 = [
+    [" __________"],
+    ["||        |"],
+    ["||        |"],
+    ["||       \O"],
+    ["||        |\\"],
+    ["||        |"],
+    ["||       / \\"],
+    ["||"],
+    ["||____________"]
+    ]
+
+hangman11 = [
+    [" __________"],
+    ["||        |"],
+    ["||        |"],
+    ["||        O"],
+    ["||       /|"],
+    ["||        |"],
+    ["||       / \\"],
+    ["||"],
+    ["||____________"]
+    ]
+
+words = [
+    ["caterpie", "bug type"], ["chansey", "normal type"], ["charizard", "fire type"], ["chikorita", "grass type"], ["cinderace", "fire type"], ["clefairy", "fairy type"], ["corsola", "water and rock type"], ["cyndaquil", "fire type"], ["darumaka", "fire type"], ["dodrio", "normal and flying type"], ["dragonair", "dragon type"], ["dragonite", "dragon and flying type"], ["dwebble", "bug and rock type"], ["electabuzz", "electric type"], ["espeon", "psychic type"], ["exeggcute", "grass and psychic type"], ["exeggutor", "grass and psychic type"], ["forretress", "bug and steel type"], ["furfrou", "normal type"], ["golduck", "water type"], ["growlithe", "fire type"], ["gyarados", "water type"]
+]
+amtGuesses = 7
+guess_easy = [hangman1, hangman2, hangman3, hangman4, hangman5, hangman6, hangman8, hangman9, hangman10, hangman7]
+guess_medium = [hangman1, hangman2, hangman3, hangman4, hangman5, hangman6, hangman11, hangman7]
+guess_hard = [hangman1, hangman2, hangman4, hangman6, hangman7]
+illustration_guess = guess_medium
+
+def clear():
+    os.system('CLS')
+
+    
+def game_code(illustration_guess, amtGuesses):
+    word_play, hint = random.choice(words)
+    word_play = word_play.upper()
+    n1, n2 = random.randint(0,len(word_play)), random.randint(0, len(word_play))
+    if n1 == n2:
+        n1 = n2 + 1
+    letter_flag = 0
+    flag = 0
+    j = 0
+    list1 = []
+    list2_with_clue = []
+    miss_guess = []
+    for i in word_play:
+        if i == ' ':
+            list1.append(" ")
+            list2_with_clue.append(" ")
+        else:
+            list1.append("__")
+            if (word_play[n1] == i or word_play[n2] == i) and letter_flag != 2:
+                letter_flag += 1
+                list2_with_clue.append(i)
+            else:
+                list2_with_clue.append("__")
+
+    while True:
+        choice = int(input("Do you want : 1) A clue    2) Two alphabets\nYour choice : "))
+        print()
+        if choice == 1:
+            break
+        elif choice == 2:
+            list1 = list2_with_clue
+            hint = "You wouldn't need a clue it seems!"
+            break
+        else:
+            print("Give a valid choice...")
+              
+    while j <= amtGuesses:
+        print_game(illustration_guess[j], list1, miss_guess, amtGuesses, hint)
+        guess = input("\nGuess a letter or a word (Enter ! for final guess): ").upper()
+        print()
+        if guess == '!':
+            final_word(word_play)
+            flag = 1
+            break
+        if guess != word_play:
+            if check_hangman(guess, list1, word_play, miss_guess):
+                continue
+            else:
+                j = j+1
+    if flag == 0:
+        final_word(word_play)  
+
+
+def final_word(word_play):
+    final_guess = input("\nAny guess? (Enter N/n if you cannot guess) : ").upper()
+    if final_guess == word_play:
+        print("\nNice work! The word you've guessed is correct!")
+        print("\n\n________H A N G M A N________\n\n")
+    else:
+        print("\nOops! The word was", word_play, ". Try again next time! Good Luck!")
+        print("\n\n________H A N G M A N________\n\n")
+         
+
+def print_game(hangman_pic, list1, miss_guess, amtGuesses, hint):
+    for i, value in enumerate(hangman_pic):
+        print(value[0])
+    print()
+    if hint == "You wouldn't need a clue it seems!":
+        print("Hint : ", hint)
+    else:
+        print("Hint : It is a", hint, "pokemon")
+    print("Word :     ",*list1)
+    print("Miss :     ",', '.join(miss_guess))
+    print("No. of chnace(s) left is(are) : ", amtGuesses-len(miss_guess))
+
+
+def check_hangman(guess, list1, word_play, miss_guess):
+    c=0
+    for k in range (0,len(word_play)):
+        if guess == word_play[k]:
+            c += 1
+            print("Good! This letter is present!")
+            list1[k] = guess
+        else:
+            continue
+    if c == 0:
+        print("Oops! You missed your chance!")
+        miss_guess.append(guess)
+        return False
+    else:
+        return True
+
+for i in hangman7:
+    print(*i)
+print(" H A N G M A N")
+
+while True:
+    print("\n\n\nMain Menu :\n[1] Start Game\n[2] Settings\n[3] Exit")
+    menu_choice = int(input("Enter a choice : "))
+    print()
+    if menu_choice == 1:
+        game_code(illustration_guess, amtGuesses)
+    elif menu_choice == 2:
+        print("\n\n\nSettings :\nWhat would you like to set the difficulty to? :")
+        print("[1] Easy\n[2] Medium\n[3] Hard\n[4] Return to Main Menu")
+        difficulty = int(input("Enter a choice : "))
+        if difficulty == 1:
+            amtGuesses = 9
+            illustration_guess = guess_easy
+        elif difficulty == 2:
+            amtGuesses = 7
+            illustration_guess = guess_medium
+        elif difficulty == 3:
+            amtGuesses = 4
+            illustration_guess = guess_hard
+        elif difficulty == 4:
+            continue
+        else:
+            print("\nPlease enter a valid choice")
+    elif menu_choice == 3:
+        break
+    else: 
+        print("\nPlease enter a valid choice")
+
+
